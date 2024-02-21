@@ -3,27 +3,32 @@ import csv
 from datasets import load_dataset
 import pandas as pd
 
-
-
-
+# Carga el conjunto de datos
 dataset = load_dataset("mstz/heart_failure")
 df = pd.DataFrame(dataset['train'])
 
+# Lee el archivo CSV y lo carga en un DataFrame
+csv_df = pd.read_csv('heart_failure_clinical_records_dataset.csv')
 
-with open('heart_failure_clinical_records_dataset.csv', 'r') as file:
-     csv_reader = csv.reader(file)
-     next(csv_reader)
-     age = [float(row[0]) for row in csv_reader] 
-        
-     edades_np = np.array(age)
+# Verifica los tipos de datos en cada columna del DataFrame original
+tipos_de_datos_original = df.dtypes
 
-df['edad_del_csv'] = age
+# Verifica los tipos de datos en cada columna del DataFrame cargado desde el CSV
+tipos_de_datos_csv = csv_df.dtypes
 
-df_perecidos = df[df['is_dead'] == 1]
-df_sobrevivientes = df[df['is_dead'] == 0]
+# Combina los DataFrames
+df_completo = pd.concat([df, csv_df], axis=1)
 
-promedio_edades_perecidos = df_perecidos['edad_del_csv'].mean()
-promedio_edades_sobrevivientes = df_sobrevivientes['edad_del_csv'].mean()
+# Calcula la cantidad de hombres fumadores y mujeres fumadoras
+cantidad_hombres_fumadores = df_completo[(df_completo['sex'] == 'Male') & (df_completo['smoking'] == 'Yes')].shape[0]
+cantidad_mujeres_fumadoras = df_completo[(df_completo['sex'] == 'Female') & (df_completo['smoking'] == 'Yes')].shape[0]
 
-print('Promedio de edades de personas que perecieron :', promedio_edades_perecidos)
-print('Promedio de edades de personas que sobrevivieron :', promedio_edades_sobrevivientes)
+print('Tipos de datos en cada columna del DataFrame original:\n', tipos_de_datos_original)
+print('Tipos de datos en cada columna del DataFrame cargado desde el CSV:\n', tipos_de_datos_csv)
+print('Cantidad de hombres fumadores:', cantidad_hombres_fumadores)
+print('Cantidad de mujeres fumadoras:', cantidad_mujeres_fumadoras)
+
+# He intentado hacer que esta version del codigo se complementara con la anterior, sin embargo siempre mostraba error y al final tuve que hacerlo asi
+
+
+
